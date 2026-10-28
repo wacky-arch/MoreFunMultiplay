@@ -1,0 +1,24 @@
+<vertical xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'
+          child-control-height='false' spacing='1.2' pad='1'>
+  <list-setting text='勝負種目' value='game-mode' options='game-mode-options' apply-on-change='true' hover-hint='今回の曲で争う競技を選択'/>
+  <slider-setting text='ターゲット (%)' value='target-score' min='0' max='100' increment='1' apply-on-change='true' hover-hint='チキンレースの目標パーセンテージ (0% - 100%)' integer-only='true'/>
+  <horizontal spacing='1.5' horizontal-fit='PreferredSize' child-align='MiddleCenter'>
+    <button text='当日総合' on-click='lobby-tab-0' pref-width='20' pref-height='7' font-size='2.8'/>
+    <button text='通算総合' on-click='lobby-tab-1' pref-width='20' pref-height='7' font-size='2.8'/>
+    <button text='運動量' on-click='lobby-tab-2' pref-width='18' pref-height='7' font-size='2.8'/>
+    <button text='地蔵' on-click='lobby-tab-3' pref-width='16' pref-height='7' font-size='2.8'/>
+    <button text='チキン' on-click='lobby-tab-4' pref-width='18' pref-height='7' font-size='2.8'/>
+  </horizontal>
+  <vertical bg='round-rect-panel' pad='2' pref-width='95' pref-height='25'>
+    <text id='lobby-ranking-text' text='ランキング読み込み中...' align='Top' font-size='3.0' rich-text='true'/>
+  </vertical>
+  <horizontal id='gp-reset-normal-row' spacing='3' horizontal-fit='PreferredSize' child-align='MiddleCenter'>
+    <button text='当日(Daily)リセット' on-click='ask-daily-reset' pref-width='40' pref-height='6.5' font-size='2.8'/>
+    <button text='通算(Total)リセット' on-click='ask-total-reset' pref-width='40' pref-height='6.5' font-size='2.8'/>
+  </horizontal>
+  <horizontal id='gp-reset-confirm-row' active='false' bg='round-rect-panel' pad='1' spacing='2' horizontal-fit='PreferredSize' child-align='MiddleCenter'>
+    <text id='gp-reset-confirm-text' text='本当にリセットしますか？' font-size='2.8' align='Center' rich-text='true'/>
+    <button text='はい (実行)' on-click='confirm-reset-click' pref-width='24' pref-height='6.5' font-size='2.8'/>
+    <button text='キャンセル' on-click='cancel-reset-click' pref-width='24' pref-height='6.5' font-size='2.8'/>
+  </horizontal>
+</vertical>

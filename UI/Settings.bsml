@@ -1,0 +1,18 @@
+<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
+  <vertical child-control-height='false' spacing='2' pad-top='2'>
+    <horizontal bg='panel-top' pad-left='10' pad-right='10' horizontal-fit='PreferredSize'>
+      <text text='MoreFunMultiplay 設定' align='Center' font-size='5'/>
+    </horizontal>
+    <list-setting text='勝負種目' value='game-mode' options='game-mode-options' apply-on-change='true' hover-hint='今回の曲で争う競技を選択'/>
+    <slider-setting text='ターゲットスコア (%)' value='target-score' min='0' max='100' increment='1' apply-on-change='true' hover-hint='チキンレースの目標パーセンテージ (0% - 100%)' integer-only='true'/>
+    <horizontal id='st-reset-normal-row' pad-top='2' spacing='3' horizontal-fit='PreferredSize'>
+      <button text='当日(Daily)リセット' on-click='ask-daily-reset' hover-hint='今日の累計得点を0に戻します'/>
+      <button text='通算(Total)リセット' on-click='ask-total-reset' hover-hint='これまでの通算得点をすべて0に戻します'/>
+    </horizontal>
+    <horizontal id='st-reset-confirm-row' active='false' bg='round-rect-panel' pad='2' spacing='3' horizontal-fit='PreferredSize' child-align='MiddleCenter'>
+      <text id='st-reset-confirm-text' text='本当にリセットしますか？' font-size='3.2' align='Center' rich-text='true'/>
+      <button text='はい (実行)' on-click='confirm-reset-click' pref-width='26' pref-height='7.5' font-size='3.0'/>
+      <button text='キャンセル' on-click='cancel-reset-click' pref-width='26' pref-height='7.5' font-size='3.0'/>
+    </horizontal>
+  </vertical>
+</bg>

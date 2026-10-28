@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🏆 MoreFunMultiplay リアルタイムランキング</title>
+  <style>
+    :root {
+      --bg-dark: #0b0e17;
+      --panel-bg: rgba(18, 24, 38, 0.94);
+      --panel-border: rgba(0, 229, 255, 0.35);
+      --accent-cyan: #00e5ff;
+      --accent-gold: #ffd700;
+      --accent-green: #00ff88;
+      --accent-red: #ff4444;
+      --text-main: #f0f4ff;
+      --text-muted: #94a3b8;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: radial-gradient(circle at top, #162038 0%, #090c14 100%);
+      color: var(--text-main);
+      font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px;
+    }
+    .container {
+      width: 100%;
+      max-width: 580px;
+      background: var(--panel-bg);
+      border: 2px solid var(--panel-border);
+      border-radius: 16px;
+      box-shadow: 0 10px 32px rgba(0, 0, 0, 0.65), 0 0 18px rgba(0, 229, 255, 0.15);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .status-badge {
+      font-size: 0.82rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+    }
+    .status-badge.live {
+      background: rgba(0, 255, 136, 0.18);
+      color: var(--accent-green);
+      border: 1px solid rgba(0, 255, 136, 0.45);
+    }
+    .room-bar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .room-input {
+      flex: 1;
+      min-width: 130px;
+      background: #0d1322;
+      border: 1.5px solid rgba(0, 229, 255, 0.4);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 700;
+      padding: 9px 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .btn {
+      background: linear-gradient(135deg, #0284c7, #00b4d8);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 9px 15px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.1s, filter 0.15s;
+    }
+    .btn:hover {
+      filter: brightness(1.15);
+    }
+    .btn:active {
+      transform: scale(0.97);
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .active-rooms-box {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .active-rooms-header {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .room-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .room-chip {
+      background: rgba(0, 229, 255, 0.12);
+      border: 1.5px solid rgba(0, 229, 255, 0.4);
+      color: #fff;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .room-chip:hover {
+      background: rgba(0, 229, 255, 0.25);
+    }
+    .room-chip.active {
+      background: rgba(255, 215, 0, 0.2);
+      border-color: var(--accent-gold);
+      color: var(--accent-gold);
+    }
+    .tabs-row-1 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .tabs-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+    }
+    .tab-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1.5px solid rgba(255, 255, 255, 0.16);
+      color: var(--text-main);
+      border-radius: 10px;
+      padding: 11px 8px;
+      font-size: 1.0rem;
+      font-weight: 800;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+    }
+    .tab-btn:hover {
+      background: rgba(255, 255, 255, 0.16);
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.28), rgba(0, 140, 255, 0.32));
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 12px rgba(0, 229, 255, 0.35);
+    }
+    .ranking-box {
+      background: rgba(6, 9, 16, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 14px 16px;
+      min-height: 320px;
+      max-height: 62vh;
+      overflow-y: auto;
+      font-size: 1.05rem;
+      line-height: 1.75;
+      white-space: pre-wrap;
+      text-align: center;
+      font-weight: 700;
+    }
+    .footer-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      padding: 0 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="top-bar">
+      <div class="title" id="header-title">🏆 MoreFunMultiplay</div>
+      <div class="status-badge" id="status-badge">ルーム未選択</div>
+    </div>
+
+    <div class="room-bar">
+      <input type="text" id="room-input" class="room-input" placeholder="ルームコード (例: ABCD)" maxlength="24" />
+      <button class="btn" id="connect-btn">接続</button>
+      <button class="btn btn-secondary" id="refresh-rooms-btn" title="稼働中ルーム一覧を更新">🔄 部屋一覧</button>
+    </div>
+
+    <div class="active-rooms-box" id="active-rooms-box">
+      <div class="active-rooms-header">
+        <span>📡 現在稼働中のルーム（タップで接続）</span>
+        <span id="rooms-updated-label">取得中...</span>
+      </div>
+      <div class="room-chips" id="room-chips">
+        <span style="color:#94a3b8;font-size:0.88rem;">稼働中のルームを検索しています...</span>
+      </div>
+    </div>
+
+    <div class="tabs-row-1">
+      <button class="tab-btn active" data-tab="0">🏆 当日総合</button>
+      <button class="tab-btn" data-tab="1">🌐 通算総合</button>
+    </div>
+    <div class="tabs-row-2">
+      <button class="tab-btn" data-tab="2">🔥 運動量</button>
+      <button class="tab-btn" data-tab="3">🗿 地蔵</button>
+      <button class="tab-btn" data-tab="4">🎯 チキン</button>
+    </div>
+
+    <div class="ranking-box" id="ranking-content">上の「稼働中のルーム」をタップするか、Multiplayer+ のルームコードを入力して「接続」を押してください。</div>
+
+    <div class="footer-info">
+      <span id="host-info-label">Host: -</span>
+      <span id="last-updated-label">最終更新: -</span>
+    </div>
+  </div>
+
+  <script>
+    const RELAY_BASE = "https://ntfy.sh";
+    const ROOM_PREFIX = "mfm_bs_room_";
+    const ACTIVE_ROOMS_TOPIC = "mfm_bs_active_rooms";
+
+    let currentRoom = "";
+    let currentTab = 0;
+    let latestSnapshot = null;
+    let eventSource = null;
+    let pollTimer = null;
+
+    const tabContents = [
+      "<color=#FFD700>🏆 本日の総合ランキング 🏆</color>\nまだ記録がありません",
+      "<color=#00E5FF>🌐 通算の総合ランキング 🌐</color>\nまだ記録がありません",
+      "<color=#FF4400>🔥 運動量ランキング 🔥</color>\nまだ記録がありません",
+      "<color=#00FFFF>🗿 地蔵スタイル賞 🗿</color>\nまだ記録がありません",
+      "<color=#FF00FF>🎯 チキンレース 🎯</color>\nまだ記録がありません"
+    ];
+
+    function sanitizeRoomCode(raw) {
+      return (raw || "").trim().toUpperCase().replace(/[^A-Z0-9_-]/g, "").slice(0, 24);
+    }
+
+    function escapeHtml(str) {
+      return (str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function renderTmpRichText(raw) {
+      if (!raw) return "";
+      let safe = escapeHtml(raw);
+      safe = safe.replace(/&lt;color=(#[0-9a-fA-F]{3,8}|[a-zA-Z]+)&gt;/g, '<span style="color:$1">');
+      safe = safe.replace(/&lt;\/color&gt;/g, "</span>");
+      return safe;
+    }
+
+    async function decompressGzipBase64(base64) {
+      const binStr = atob(base64);
+      const bytes = new Uint8Array(binStr.length);
+      for (let i = 0; i < binStr.length; i++) {
+        bytes[i] = binStr.charCodeAt(i);
+      }
+      const ds = new DecompressionStream("gzip");
+      const writer = ds.writable.getWriter();
+      writer.write(bytes);
+      writer.close();
+      const resp = new Response(ds.readable);
+      return await resp.text();
+    }
+
+    async function parseSnapshotPayload(rawMsg) {
+      try {
+        const obj = JSON.parse(rawMsg);
+        if (obj && obj.gz) {
+          const decompressed = await decompressGzipBase64(obj.gz);
+          return JSON.parse(decompressed);
+        }
+        return obj;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function applySnapshot(snap) {
+      if (!snap || !snap.tabs || snap.tabs.length !== 5) return;
+      if (latestSnapshot && latestSnapshot.room === snap.room && snap.ts <= latestSnapshot.ts) return;
+
+      const isNewSong = snap.songEnded && (!latestSnapshot || snap.ts > latestSnapshot.ts);
+      latestSnapshot = snap;
+
+      for (let i = 0; i < 5; i++) {
+        if (snap.tabs[i]) tabContents[i] = snap.tabs[i];
+      }
+
+      if (isNewSong && typeof snap.tab === "number" && snap.tab >= 0 && snap.tab < 5) {
+        switchTab(snap.tab);
+      } else {
+        renderCurrentTab();
+      }
+
+      document.getElementById("header-title").textContent = `🏆 MFM [Code: ${snap.room}]`;
+      document.getElementById("host-info-label").textContent = `👑 Host: ${snap.host || "-"} (本日 ${snap.dailyMatches || 0}曲 / 通算 ${snap.totalMatches || 0}曲)`;
+      const dt = snap.ts ? new Date(snap.ts) : new Date();
+      document.getElementById("last-updated-label").textContent = `最終更新: ${dt.toLocaleTimeString("ja-JP")}`;
+    }
+
+    function switchTab(idx) {
+      currentTab = idx;
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.classList.toggle("active", Number(btn.dataset.tab) === idx);
+      });
+      renderCurrentTab();
+    }
+
+    function renderCurrentTab() {
+      const box = document.getElementById("ranking-content");
+      box.innerHTML = renderTmpRichText(tabContents[currentTab]);
+    }
+
+    async function fetchRoomHistory(roomCode) {
+      try {
+        const res = await fetch(`${RELAY_BASE}/${ROOM_PREFIX}${roomCode}/json?poll=1&since=12h`, { cache: "no-store" });
+        const text = await res.text();
+        const lines = text.split("\n").filter(Boolean);
+        let lastMsg = null;
+        for (const line of lines) {
+          try {
+            const ev = JSON.parse(line);
+            if (ev.event === "message" && ev.message && ev.message.startsWith("{")) {
+              lastMsg = ev.message;
+            }
+          } catch {}
+        }
+        if (lastMsg) {
+          const snap = await parseSnapshotPayload(lastMsg);
+          if (snap) applySnapshot(snap);
+        }
+      } catch (e) {
+        console.warn("Poll error:", e);
+      }
+    }
+
+    function connectToRoom(rawCode) {
+      const code = sanitizeRoomCode(rawCode);
+      if (!code) return;
+
+      currentRoom = code;
+      latestSnapshot = null;
+      document.getElementById("room-input").value = code;
+
+      const url = new URL(window.location.href);
+      url.searchParams.set("room", code);
+      window.history.replaceState({}, "", url.toString());
+
+      const badge = document.getElementById("status-badge");
+      badge.textContent = `🟢 接続中: ${code}`;
+      badge.classList.add("live");
+
+      document.querySelectorAll(".room-chip").forEach(chip => {
+        chip.classList.toggle("active", chip.dataset.room === code);
+      });
+
+      document.getElementById("ranking-content").innerHTML = `<span style="color:#00e5ff">ルーム [${code}] のデータを取得中...</span>`;
+
+      if (eventSource) {
+        eventSource.close();
+        eventSource = null;
+      }
+      if (pollTimer) {
+        clearInterval(pollTimer);
+        pollTimer = null;
+      }
+
+      fetchRoomHistory(code);
+
+      try {
+        eventSource = new EventSource(`${RELAY_BASE}/${ROOM_PREFIX}${code}/sse`);
+        eventSource.onmessage = async (ev) => {
+          try {
+            const data = JSON.parse(ev.data);
+            if (data && data.message && data.message.startsWith("{")) {
+              const snap = await parseSnapshotPayload(data.message);
+              if (snap) applySnapshot(snap);
+            }
+          } catch {}
+        };
+      } catch {}
+
+      pollTimer = setInterval(() => fetchRoomHistory(code), 8000);
+    }
+
+    async function loadActiveRooms() {
+      const chipsContainer = document.getElementById("room-chips");
+      const updatedLabel = document.getElementById("rooms-updated-label");
+      try {
+        const res = await fetch(`${RELAY_BASE}/${ACTIVE_ROOMS_TOPIC}/json?poll=1&since=6h`, { cache: "no-store" });
+        const text = await res.text();
+        const lines = text.split("\n").filter(Boolean);
+        const roomsMap = new Map();
+
+        for (const line of lines) {
+          try {
+            const ev = JSON.parse(line);
+            if (ev.event === "message" && ev.message && ev.message.startsWith("{")) {
+              const info = JSON.parse(ev.message);
+              if (info && info.room) {
+                roomsMap.set(info.room, info);
+              }
+            }
+          } catch {}
+        }
+
+        const rooms = Array.from(roomsMap.values()).sort((a, b) => (b.ts || 0) - (a.ts || 0));
+        updatedLabel.textContent = `${new Date().toLocaleTimeString("ja-JP")} 更新`;
+
+        if (rooms.length === 0) {
+          chipsContainer.innerHTML = `<span style="color:#94a3b8;font-size:0.88rem;">直近6時間以内に稼働したルームはありません（ルームコードを直接入力できます）</span>`;
+          return;
+        }
+
+        chipsContainer.innerHTML = "";
+        for (const r of rooms) {
+          const btn = document.createElement("button");
+          btn.className = "room-chip" + (r.room === currentRoom ? " active" : "");
+          btn.dataset.room = r.room;
+          btn.innerHTML = `👑 ${escapeHtml(r.host || "Host")} <span style="color:#00e5ff">[${escapeHtml(r.room)}]</span> <span style="font-size:0.8rem;color:#cbd5e1">${escapeHtml(r.mode || "")}</span>`;
+          btn.onclick = () => connectToRoom(r.room);
+          chipsContainer.appendChild(btn);
+        }
+
+        if (!currentRoom && rooms.length === 1) {
+          connectToRoom(rooms[0].room);
+        }
+      } catch (e) {
+        updatedLabel.textContent = "取得失敗";
+      }
+    }
+
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => switchTab(Number(btn.dataset.tab)));
+    });
+
+    document.getElementById("connect-btn").addEventListener("click", () => {
+      connectToRoom(document.getElementById("room-input").value);
+    });
+
+    document.getElementById("room-input").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") connectToRoom(e.target.value);
+    });
+
+    document.getElementById("refresh-rooms-btn").addEventListener("click", loadActiveRooms);
+
+    const params = new URLSearchParams(window.location.search);
+    const initialRoom = sanitizeRoomCode(params.get("room"));
+    loadActiveRooms().then(() => {
+      if (initialRoom) connectToRoom(initialRoom);
+    });
+    setInterval(loadActiveRooms, 20000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/bsmg/BSIPA-MetadataFileSchema/master/Schema.json",
+  "id": "MoreFunMultiplay",
+  "name": "MoreFunMultiplay",
+  "author": "wacky",
+  "version": "0.3.0",
+  "description": "MoreFunMultiplay ranking extension for Beat Saber and Multiplayer+",
+  "gameVersion": "1.40.8",
+  "dependsOn": {
+    "BSIPA": "^4.2.0",
+    "BeatSaberMarkupLanguage": "^1.6.0"
+  },
+  "loadAfter": [
+    "BeatSaberMarkupLanguage",
+    "BeatSaberPlus_Multiplayer"
+  ]
+}
