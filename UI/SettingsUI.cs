@@ -134,7 +134,6 @@ namespace MoreFunMultiplay.UI
                 else if (value == "チキンレース") PluginConfig.Instance.SelectedGameMode = (int)GameMode.ChickenRace;
                 else PluginConfig.Instance.SelectedGameMode = (int)GameMode.None;
                 ResultsUIHost.Instance.UpdateTabContents();
-                ResultsUIHost.Instance.PublishCurrentStateToCloud(false);
             }
         }
 
@@ -146,7 +145,6 @@ namespace MoreFunMultiplay.UI
             {
                 PluginConfig.Instance.TargetScorePercentage = value;
                 ResultsUIHost.Instance.UpdateTabContents();
-                ResultsUIHost.Instance.PublishCurrentStateToCloud(false);
             }
         }
 

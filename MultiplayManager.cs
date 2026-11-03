@@ -33,7 +33,6 @@ namespace MoreFunMultiplay
         private float _updateInterval = 0.1f;
         private float _timer = 0f;
         private float _roomCheckTimer = 0f;
-        private float _syncPollTimer = 0f;
         private string _lastAnnouncedRoomCode = "";
 
         private void Awake()
@@ -54,6 +53,18 @@ namespace MoreFunMultiplay
             IsInSong = true;
             _timer = 0f;
             ResultsUIHost.Instance.MarkSongStarted();
+
+            if (MultiplayerPlusBridge.IsLocalPlayerRoomHost())
+            {
+                ResultsUIHost.Instance.UpdateTabContents();
+                ResultsUIHost.Instance.PublishCurrentStateToCloud(false);
+            }
+            else
+            {
+                string roomCode = MultiplayerPlusBridge.GetCurrentRoomCode();
+                RoomSyncManager.TriggerParticipantFetchWithRetries(roomCode);
+            }
+
             Plugin.Log.Info("MultiplayManager: Song tracking started (Multiplayer+ Room).");
         }
 
@@ -116,23 +127,12 @@ namespace MoreFunMultiplay
                     string roomCode = MultiplayerPlusBridge.GetCurrentRoomCode();
                     if (!string.IsNullOrEmpty(roomCode))
                     {
-                        if (MultiplayerPlusBridge.IsLocalPlayerRoomHost())
+                        if (_lastAnnouncedRoomCode != roomCode)
                         {
-                            if (_lastAnnouncedRoomCode != roomCode)
+                            _lastAnnouncedRoomCode = roomCode;
+                            ResultsUIHost.Instance.UpdateHeaderText();
+                            if (!MultiplayerPlusBridge.IsLocalPlayerRoomHost())
                             {
-                                _lastAnnouncedRoomCode = roomCode;
-                                ResultsUIHost.Instance.UpdateHeaderText();
-                                ResultsUIHost.Instance.PublishCurrentStateToCloud(false);
-                            }
-                        }
-                        else
-                        {
-                            _syncPollTimer += 0.5f;
-                            if (_syncPollTimer >= 6.0f || _lastAnnouncedRoomCode != roomCode)
-                            {
-                                _syncPollTimer = 0f;
-                                _lastAnnouncedRoomCode = roomCode;
-                                ResultsUIHost.Instance.UpdateHeaderText();
                                 RoomSyncManager.PollLatestRoomSnapshotAsync(roomCode);
                             }
                         }

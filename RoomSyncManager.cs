@@ -64,6 +64,9 @@ namespace MoreFunMultiplay
         private static string _lastAppliedRoomCode = "";
         private static long _lastActiveRoomAnnounceMs = 0;
         private static bool _isPolling = false;
+        private static readonly object _publishLock = new object();
+        private static System.Threading.CancellationTokenSource _debounceCts = null;
+        private static long _rateLimitCooldownUntilMs = 0;
 
         public static string SanitizeRoomCode(string rawCode)
         {
@@ -80,7 +83,26 @@ namespace MoreFunMultiplay
             if (string.IsNullOrEmpty(roomCode)) return;
 
             snapshot.RoomCode = roomCode;
-            snapshot.TimestampUnixMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+            // 曲開始時・曲終了時（および手動リセット時）のみ送信する設計のため即時送信
+            lock (_publishLock)
+            {
+                _debounceCts?.Cancel();
+                _debounceCts = null;
+            }
+            ExecutePublish(snapshot, isSongEndUpdate);
+        }
+
+        private static void ExecutePublish(RoomRankingSnapshot snapshot, bool isSongEndUpdate)
+        {
+            long nowMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            // 429レート制限中の場合はクールダウン（曲終了時のみ救済再試行）
+            if (nowMs < _rateLimitCooldownUntilMs && !isSongEndUpdate)
+            {
+                return;
+            }
+
+            snapshot.TimestampUnixMs = nowMs;
             snapshot.IsSongEndUpdate = isSongEndUpdate;
 
             Task.Run(() =>
@@ -104,13 +126,14 @@ namespace MoreFunMultiplay
                         });
                     }
 
-                    string roomUrl = $"{RelayBaseUrl}/{RoomTopicPrefix}{roomCode}";
+                    string roomUrl = $"{RelayBaseUrl}/{RoomTopicPrefix}{snapshot.RoomCode}";
                     PostString(roomUrl, payloadToSend);
 
-                    long nowMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                    if (isSongEndUpdate || (nowMs - _lastActiveRoomAnnounceMs) > 8000)
+                    long currentMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                    // 稼働中部屋アナウンスは曲終了時、または30秒以上の間隔でのみ送信
+                    if (isSongEndUpdate || (currentMs - _lastActiveRoomAnnounceMs) > 30000)
                     {
-                        _lastActiveRoomAnnounceMs = nowMs;
+                        _lastActiveRoomAnnounceMs = currentMs;
                         string modeName = GetModeDisplayName((GameMode)snapshot.SelectedGameMode, snapshot.TargetScorePercentage);
                         string announceJson = JsonConvert.SerializeObject(new
                         {
@@ -123,6 +146,16 @@ namespace MoreFunMultiplay
                         });
                         PostString($"{RelayBaseUrl}/{ActiveRoomsTopic}", announceJson);
                     }
+                }
+                catch (WebException webEx)
+                {
+                    if (webEx.Response is HttpWebResponse httpResp && (int)httpResp.StatusCode == 429)
+                    {
+                        _rateLimitCooldownUntilMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + 30000;
+                        Plugin.Log.Warn("RoomSyncManager hit ntfy rate limit (429 Too Many Requests). Cooldown for 30s.");
+                        return;
+                    }
+                    Plugin.Log.Warn("RoomSyncManager PublishHostSnapshot warning: " + webEx.Message);
                 }
                 catch (Exception ex)
                 {
@@ -138,7 +171,7 @@ namespace MoreFunMultiplay
 
             Task.Run(async () =>
             {
-                int[] delaysMs = new int[] { 700, 1800, 2500 };
+                int[] delaysMs = new int[] { 1200, 3000 };
                 foreach (int delay in delaysMs)
                 {
                     await Task.Delay(delay).ConfigureAwait(false);

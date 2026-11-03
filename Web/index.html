@@ -225,7 +225,10 @@
 
     <div class="active-rooms-box" id="active-rooms-box">
       <div class="active-rooms-header">
-        <span>📡 現在稼働中のルーム（タップで接続）</span>
+        <span id="toggle-rooms-title" style="cursor:pointer; display:flex; align-items:center; gap:6px;">
+          <span>📡 稼働中のルーム（ホスト最新）</span>
+          <span id="rooms-toggle-arrow" style="font-size:0.8rem; color:var(--accent-cyan);">[閉じる ▲]</span>
+        </span>
         <span id="rooms-updated-label">取得中...</span>
       </div>
       <div class="room-chips" id="room-chips">
@@ -406,10 +409,19 @@
         pollTimer = null;
       }
 
+      // 初回の現在状態取得
       fetchRoomHistory(code);
 
+      // SSE (Server-Sent Events) による常時リアルタイム接続
+      // ※SSE接続中は余計なポーリングAPIリクエストを一切行わず、リクエスト上限を大幅節約
       try {
         eventSource = new EventSource(`${RELAY_BASE}/${ROOM_PREFIX}${code}/sse`);
+        eventSource.onopen = () => {
+          if (pollTimer) {
+            clearInterval(pollTimer);
+            pollTimer = null;
+          }
+        };
         eventSource.onmessage = async (ev) => {
           try {
             const data = JSON.parse(ev.data);
@@ -419,37 +431,66 @@
             }
           } catch {}
         };
-      } catch {}
+        eventSource.onerror = () => {
+          // 万が一SSEが切断された場合のみ、25秒間隔で低頻度フォールバックポーリング
+          if (!pollTimer) {
+            pollTimer = setInterval(() => fetchRoomHistory(code), 25000);
+          }
+        };
+      } catch (e) {
+        pollTimer = setInterval(() => fetchRoomHistory(code), 25000);
+      }
+    }
 
-      pollTimer = setInterval(() => fetchRoomHistory(code), 8000);
+    let isRoomsBoxOpen = true;
+
+    function toggleRoomsBox(forceOpen = null) {
+      if (forceOpen !== null) {
+        isRoomsBoxOpen = forceOpen;
+      } else {
+        isRoomsBoxOpen = !isRoomsBoxOpen;
+      }
+      const chips = document.getElementById("room-chips");
+      const arrow = document.getElementById("rooms-toggle-arrow");
+      if (chips) chips.style.display = isRoomsBoxOpen ? "flex" : "none";
+      if (arrow) arrow.textContent = isRoomsBoxOpen ? "[閉じる ▲]" : "[開く ▼]";
     }
 
     async function loadActiveRooms() {
       const chipsContainer = document.getElementById("room-chips");
       const updatedLabel = document.getElementById("rooms-updated-label");
       try {
-        const res = await fetch(`${RELAY_BASE}/${ACTIVE_ROOMS_TOPIC}/json?poll=1&since=6h`, { cache: "no-store" });
+        const res = await fetch(`${RELAY_BASE}/${ACTIVE_ROOMS_TOPIC}/json?poll=1&since=3h`, { cache: "no-store" });
         const text = await res.text();
         const lines = text.split("\n").filter(Boolean);
-        const roomsMap = new Map();
+        const hostMap = new Map();
+        const now = Date.now();
 
         for (const line of lines) {
           try {
             const ev = JSON.parse(line);
             if (ev.event === "message" && ev.message && ev.message.startsWith("{")) {
               const info = JSON.parse(ev.message);
-              if (info && info.room) {
-                roomsMap.set(info.room, info);
+              if (info && info.room && info.host) {
+                // 3時間以内のデータのみ有効
+                if (info.ts && (now - info.ts > 3 * 3600 * 1000)) continue;
+
+                // 同じホスト名の場合は最新の1つだけを保持
+                const hostKey = String(info.host).trim().toLowerCase();
+                const existing = hostMap.get(hostKey);
+                if (!existing || (info.ts || 0) >= (existing.ts || 0)) {
+                  hostMap.set(hostKey, info);
+                }
               }
             }
           } catch {}
         }
 
-        const rooms = Array.from(roomsMap.values()).sort((a, b) => (b.ts || 0) - (a.ts || 0));
+        const rooms = Array.from(hostMap.values()).sort((a, b) => (b.ts || 0) - (a.ts || 0));
         updatedLabel.textContent = `${new Date().toLocaleTimeString("ja-JP")} 更新`;
 
         if (rooms.length === 0) {
-          chipsContainer.innerHTML = `<span style="color:#94a3b8;font-size:0.88rem;">直近6時間以内に稼働したルームはありません（ルームコードを直接入力できます）</span>`;
+          chipsContainer.innerHTML = `<span style="color:#94a3b8;font-size:0.88rem;">稼働中のルームはありません（コードを直接入力して接続できます）</span>`;
           return;
         }
 
@@ -483,14 +524,19 @@
       if (e.key === "Enter") connectToRoom(e.target.value);
     });
 
-    document.getElementById("refresh-rooms-btn").addEventListener("click", loadActiveRooms);
+    document.getElementById("toggle-rooms-title").addEventListener("click", () => toggleRoomsBox());
+
+    document.getElementById("refresh-rooms-btn").addEventListener("click", () => {
+      toggleRoomsBox(true);
+      loadActiveRooms();
+    });
 
     const params = new URLSearchParams(window.location.search);
     const initialRoom = sanitizeRoomCode(params.get("room"));
     loadActiveRooms().then(() => {
       if (initialRoom) connectToRoom(initialRoom);
     });
-    setInterval(loadActiveRooms, 20000);
+    setInterval(loadActiveRooms, 60000);
   </script>
 </body>
 </html>
