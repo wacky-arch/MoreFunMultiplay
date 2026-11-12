@@ -2,11 +2,11 @@
 
 Beat Saber のマルチプレイヤー（Multiplayer+ / BeatSaberPlus）をもっと楽しく遊ぶための、独自勝負種目・ランキング拡張MODです。  
 通常のスコア競争とは一味違う、運動量対決や地蔵プレイ、チキンレースなどの特殊ルールでマルチプレイを楽しめます。  
-さらに、**リアルタイム WebViewer** を搭載しており、OBS等の配信ソフトやブラウザからランキング状況をオーバーレイ表示できます。
+さらに、**リアルタイム WebViewer** を搭載しており、世界中どこからでもブラウザやOBS等の配信ソフトからランキング状況をオーバーレイ表示できます。
 
 A custom game mode and ranking extension mod for Beat Saber multiplayer (Multiplayer+ / BeatSaberPlus).  
 Enjoy unique party modes such as Sweat (movement/calories), Jizo (stillness challenge), and Chicken Race (target score precision).  
-Includes a **Real-time WebViewer** to overlay live match standings in OBS or web browsers.
+Includes a **Real-time WebViewer** accessible worldwide via web browser or OBS stream overlays.
 
 ---
 
@@ -25,6 +25,25 @@ Includes a **Real-time WebViewer** to overlay live match standings in OBS or web
 
 ---
 
+## 📺 リアルタイム WebViewer / Live WebViewer
+
+### 🌐 公開Webビューアー / Hosted Online WebViewer
+👉 **[https://mfm-viewer.pages.dev/](https://mfm-viewer.pages.dev/)**
+
+- **日本語**:
+  - 上記のWebサイトにアクセスするだけで、**世界中の誰でも**PC、スマートフォン、タブレット等のブラウザからリアルタイムに対戦ランキングやルーム稼働状況を閲覧できます！
+  - OBS等の配信ソフトで「ブラウザ」ソースを追加し、URLに `https://mfm-viewer.pages.dev/?room=[ルームコード]` を指定すれば、配信画面にスタイリッシュな対戦リザルトを直接オーバーレイ表示できます。
+  - ローカル環境用として同梱されている `UserData/MoreFunMultiplay_WebViewer.html` を直接開いて利用することも可能です。
+  - 常時SSE（Server-Sent Events）ストリーム接続により、API制限を回避しつつ超低遅延でリアルタイム同期します。
+
+- **English**:
+  - Anyone around the world can view live match rankings and active multiplayer rooms simply by visiting **[https://mfm-viewer.pages.dev/](https://mfm-viewer.pages.dev/)** from any browser (PC, mobile, tablet)!
+  - Easily used as an OBS Browser Source by setting the URL to `https://mfm-viewer.pages.dev/?room=[ROOM_CODE]` for clean, real-time stream overlays.
+  - The bundled local file `UserData/MoreFunMultiplay_WebViewer.html` is also available for offline/local use.
+  - Powered by persistent Server-Sent Events (SSE) streaming for instantaneous updates without hitting rate limits.
+
+---
+
 ## 🎮 主なゲームモード / Game Modes
 
 1. **運動量 (Sweat)**
@@ -36,12 +55,6 @@ Includes a **Real-time WebViewer** to overlay live match standings in OBS or web
 3. **チキンレース (Chicken Race)**
    - **日本語**: 設定した目標スコア（例: 80%）に「最も近く、かつ超えない（または最も近い）」絶妙なスコアコントロールを競う心理戦ルール。
    - **English**: A precision score-control match where players aim to get as close as possible to a target score % (e.g. 80%) without exceeding it.
-
----
-
-## 📺 リアルタイム WebViewer / Real-time WebViewer
-- **日本語**: `UserData/MoreFunMultiplay_WebViewer.html` をOBSの「ブラウザ」ソースやChrome等で開くだけで、配信画面に対戦リザルトやルーム状況を美しくオーバーレイ表示できます。常時SSEストリーム接続により低遅延かつ低負荷で同期します。
-- **English**: Simply open `UserData/MoreFunMultiplay_WebViewer.html` in an OBS Browser Source or web browser to display stylish live match results and standings. Uses Server-Sent Events (SSE) for low-latency, rate-limit-safe real-time updates.
 
 ---
 
