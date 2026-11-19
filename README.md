@@ -1,11 +1,11 @@
 # MoreFunMultiplay
 
-Beat Saber のマルチプレイヤー（Multiplayer+ / BeatSaberPlus）をもっと楽しく遊ぶための、独自勝負種目・ランキング拡張MODです。  
-通常のスコア競争とは一味違う、運動量対決や地蔵プレイ、チキンレースなどの特殊ルールでマルチプレイを楽しめます。  
+Beat Saber のマルチプレイヤー（Multiplayer+ / BeatSaberPlus）をもっと楽しく遊ぶための、独自勝負種目（全5種目）・ランキング拡張MODです。  
+通常のスコア競争とは一味違う、運動量対決・地蔵プレイ・チキンレース・シンメトリー・Wild の5種類の特殊ルールでマルチプレイを楽しめます。  
 さらに、**リアルタイム WebViewer** を搭載しており、世界中どこからでもブラウザやOBS等の配信ソフトからランキング状況をオーバーレイ表示できます。
 
-A custom game mode and ranking extension mod for Beat Saber multiplayer (Multiplayer+ / BeatSaberPlus).  
-Enjoy unique party modes such as Sweat (movement/calories), Jizo (stillness challenge), and Chicken Race (target score precision).  
+A custom game mode (5 modes) and ranking extension mod for Beat Saber multiplayer (Multiplayer+ / BeatSaberPlus).  
+Enjoy 5 unique party modes: Sweat, Jizo, Chicken Race, Symmetry, and Wild.  
 Includes a **Real-time WebViewer** accessible worldwide via web browser or OBS stream overlays.
 
 ---
@@ -44,17 +44,23 @@ Includes a **Real-time WebViewer** accessible worldwide via web browser or OBS s
 
 ---
 
-## 🎮 主なゲームモード / Game Modes
+## 🎮 主なゲームモード（全5種目） / Game Modes (5 Modes)
 
-1. **運動量 (Sweat)**
+1. **🔥 運動量ランキング (Sweat)**
    - **日本語**: プレイ中のヘッドセットやコントローラーの移動距離・加速度をリアルタイム計測。「最も身体を動かして汗をかいたプレイヤー」をランキング！
    - **English**: Measures HMD and controller movements and acceleration in real time. Ranks players by who moved the most and broke a sweat!
-2. **地蔵 (Jizo)**
+2. **🗿 地蔵スタイル賞 (Jizo)**
    - **日本語**: 運動量とは逆に、「いかに頭や体を動かさず、最小限の動きでノーツを叩けたか」を競う忍耐ルール。
    - **English**: The opposite of Sweat—a stillness challenge competing for who can hit notes with minimal head and body movement.
-3. **チキンレース (Chicken Race)**
+3. **🎯 チキンレース (Chicken Race)**
    - **日本語**: 設定した目標スコア（例: 80%）に「最も近く、かつ超えない（または最も近い）」絶妙なスコアコントロールを競う心理戦ルール。
    - **English**: A precision score-control match where players aim to get as close as possible to a target score % (e.g. 80%) without exceeding it.
+4. **⚖️ シンメトリー (Symmetry)**
+   - **日本語**: 左手と右手の移動距離の均等さ（左右差の小ささ）× 精度% で評価。左右バランス良く綺麗に振って高精度を出したプレイヤーが上位！
+   - **English**: Evaluates left/right hand movement symmetry combined with accuracy (`Accuracy / (1 + LR Diff%)`). Rewards balanced swings with high accuracy!
+5. **💥 Wild**
+   - **日本語**: 「クリアした中で最もミスが多いプレイヤー（ギリギリ生還）」が上位になるカオスルール！（※Fail時は高精度なプレイヤーが上位）
+   - **English**: A chaotic survival mode where the cleared player with the **most misses** wins! (Among failed players, higher accuracy ranks higher.)
 
 ---
 

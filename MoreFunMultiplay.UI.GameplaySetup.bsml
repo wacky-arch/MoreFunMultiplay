@@ -2,12 +2,14 @@
           child-control-height='false' spacing='1.2' pad='1'>
   <list-setting text='勝負種目' value='game-mode' options='game-mode-options' apply-on-change='true' hover-hint='今回の曲で争う競技を選択'/>
   <slider-setting text='ターゲット (%)' value='target-score' min='0' max='100' increment='1' apply-on-change='true' hover-hint='チキンレースの目標パーセンテージ (0% - 100%)' integer-only='true'/>
-  <horizontal spacing='1.5' horizontal-fit='PreferredSize' child-align='MiddleCenter'>
-    <button text='当日総合' on-click='lobby-tab-0' pref-width='20' pref-height='7' font-size='2.8'/>
-    <button text='通算総合' on-click='lobby-tab-1' pref-width='20' pref-height='7' font-size='2.8'/>
-    <button text='運動量' on-click='lobby-tab-2' pref-width='18' pref-height='7' font-size='2.8'/>
-    <button text='地蔵' on-click='lobby-tab-3' pref-width='16' pref-height='7' font-size='2.8'/>
-    <button text='チキン' on-click='lobby-tab-4' pref-width='18' pref-height='7' font-size='2.8'/>
+  <horizontal spacing='0.8' horizontal-fit='PreferredSize' child-align='MiddleCenter'>
+    <button text='当日総合' on-click='lobby-tab-0' pref-width='13.5' pref-height='7' font-size='2.5'/>
+    <button text='通算総合' on-click='lobby-tab-1' pref-width='13.5' pref-height='7' font-size='2.5'/>
+    <button text='運動量' on-click='lobby-tab-2' pref-width='12.5' pref-height='7' font-size='2.5'/>
+    <button text='地蔵' on-click='lobby-tab-3' pref-width='11.5' pref-height='7' font-size='2.5'/>
+    <button text='チキン' on-click='lobby-tab-4' pref-width='12.5' pref-height='7' font-size='2.5'/>
+    <button text='シンメ' on-click='lobby-tab-5' pref-width='12.5' pref-height='7' font-size='2.5'/>
+    <button text='Wild' on-click='lobby-tab-6' pref-width='12.0' pref-height='7' font-size='2.5'/>
   </horizontal>
   <vertical bg='round-rect-panel' pad='2' pref-width='95' pref-height='25'>
     <text id='lobby-ranking-text' text='ランキング読み込み中...' align='Top' font-size='3.0' rich-text='true'/>
