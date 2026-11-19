@@ -46,7 +46,7 @@ Includes a **Real-time WebViewer** accessible worldwide via web browser or OBS s
    - プレイ中のヘッドセットやコントローラーの移動距離・加速度をリアルタイム計測。「最も身体を動かして汗をかいたプレイヤー」をランキング！
    - Measures HMD and controller movements and acceleration in real time. Ranks players by who moved the most and broke a sweat!
 2. **🗿 地蔵スタイル賞 (Jizo)**
-   - 運動量とは逆に、「いかに頭や体を動かさず、最小限の動きでノーツを叩けたか」を競う忍耐ルール。
+   - 運動量とは逆に、「いかに頭を動かさず、最小限の動きでノーツを叩けたか」を競う忍耐ルール。
    - The opposite of Sweat—a stillness challenge competing for who can hit notes with minimal head and body movement.
 3. **🎯 チキンレース (Chicken Race)**
    - 設定した目標スコア（例: 80%）に「最も近く、かつ超えない（または最も近い）」絶妙なスコアコントロールを競う心理戦ルール。
